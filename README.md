@@ -1,24 +1,21 @@
 ## Tang Nano 9K port
 
-The new Gowin project is `3D-renderer-port.gprj`. It uses the DVI/HDMI output
-path from the local `dvi_tx_22` reference and displays the eight vertices of the
-original hard-coded cube as colored points. The renderer updates its projected
+This is a Gowin Tang Nano 9K port of the project https://github.com/DigitalDesignDen/crude-3D-render-demo.git.
+It uses the DVI/HDMI output for display.
+It displays eight vertices of a hard-coded cube as colored points.
+The renderer updates its projected
 vertices once per video frame; it performs Y-axis rotation, uniform model
 scaling, and perspective division. It intentionally has no line drawing or
 frame buffer.
 
-Open the GPRJ in Gowin EDA and target the Tang Nano 9K (`GW1NR-LV9QN88PC6/I5`).
+
 The default model scale is 0.5 (`MODEL_SCALE_Q8_8 = 128`, Q8.8) and the focal
 length is 120 pixels. These are generics on `TOP` in `src/TOP.vhd`. The DVI
-timing is 720x480 with the 27 MHz pixel clock and 5x serial PLL from the
-reference project.
+timing is 720x480 with the 27 MHz pixel clock and 5x serial PLL.
 
-The original Cyclone V sources are retained at the repository root. The new
-board-specific VHDL and the DVI reference files are in `src/`.
-Upstream source: https://github.com/DigitalDesignDen/crude-3D-render-demo.git
+The original Cyclone V sources are found here: https://github.com/DigitalDesignDen/crude-3D-render-demo.git
 
 ## Original project
-
 
 
 A deliberately crude and experimental, but functional 3D graphics pipeline written in VHDL. Fixed-point math, matrix transforms, perspective projection, and basic rendering experiments targeting FPGA hardware. Built for learning, tinkering, and iterative improvement. Not pretty, not fast, but real hardware 3D — and a playground for improvement.
@@ -48,21 +45,21 @@ The focus is on **learning, experimentation, and clarity**, not performance or v
 * Fixed-point 3D math (no floating point)
 * Model-view-projection pipeline
 * Perspective projection
-* Wireframe rendering
+* ~~Wireframe rendering~~
 * Rotation via transformation matrices
-* Rotation input via potentiometer + ADC an board OR rot input via counter
+* ~~Rotation input via potentiometer + ADC an board OR rot input via counter~~
 * HDMI / video output (FPGA-driven)
 
 ---
 
 ## Demo
 
-|Rotating Cube|Icosphere|
-|-|-|
-|![cube](images/cube.gif)|![icosphere](images/icosphere.gif)|
+|Rotating Cube|
+|-|
+|![cube](images/cube.gif)|
 
 ---
-
+~~
 ## High-level pipeline
 
 ```text
@@ -138,3 +135,4 @@ This script needs to be modified to account for the path of your Quartus install
 * [ ] More control interfaces
 * [ ] Frame buffer
 * [ ] Line-drawing algorithm like Bresenham or Xiaolin Wu
+~~
