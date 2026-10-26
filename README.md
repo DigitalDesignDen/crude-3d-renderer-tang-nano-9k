@@ -78,14 +78,14 @@ Video Output
 ---
 ## Project structure
 ./ <br>
- ├── _archive/               # useful snippets and entities currently not used<br>
- ├── images/                 # images for the README.md<br>
- ├── impl/                   # dir for config.json and output files of synth and pnr<br>
- ├── src/\*.vhd / \*.vhdl      # source files VHDL<br>
+ ├── _archive/               &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# useful snippets and entities currently not used<br>
+ ├── images/                 &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# images for the README.md<br>
+ ├── impl/                   &nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;# dir for config.json and output files of synth and pnr<br>
+ ├── src/\*.vhd / \*.vhdl      &emsp;&emsp;# source files VHDL<br>
  ├── src/\*.sdc          &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# Synopsys design contraint file (timing constraints)<br>
- ├── src/\*.cst               # physical constraints file (pin mapping)<br>
- ├── *.gprj                  # gowin project file<br>
- └── *.vhd                  # VHDL source files
+ ├── src/\*.cst               &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# physical constraints file (pin mapping)<br>
+ ├── *.gprj                  &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;# gowin project file<br>
+ └── *.vhd                  &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;# VHDL source files
 
 ---
 ## Build / Simulation
