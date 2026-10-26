@@ -59,7 +59,7 @@ The focus is on **learning, experimentation, and clarity**, not performance or v
 |![cube](images/cube.gif)|
 
 ---
-~~
+
 ## High-level pipeline
 
 ```text
@@ -71,63 +71,53 @@ Perspective Divide
    ↓
 Screen Space Mapping
    ↓
-Line Rasterization
+~~lIne Rasterization~~
    ↓
 Video Output
 ```
 ---
 ## Project structure
 ./ <br>
- ├── supplemental/     &ensp;&nbsp;&nbsp;# Python and blender files for exporting verticies<br>
- ├── transform/      &emsp;&nbsp;&emsp;&nbsp;&nbsp;# Matrix-vector multiplication<br>
- ├── *.qpf          &ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# Quartus project file<br>
- ├── *.qsf          &nbsp;&ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# Some Quartus file<br>
- ├── *.sdc          &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# Synopsys design contraint file (timing constraints)<br>
- ├── compile_wo_sta &ensp;# .bat for cmd compilation via Quartus II API (w/o static timing analysis)<br>
- ├── compile_w_sta  &emsp;# .bat for cmd compilation via Quartus II API (with static timing analysis)<br>
+ ├── _archive/     &ensp;&nbsp;&nbsp;# useful snippets and entities currently not used<br>
+ ├── images/      &emsp;&nbsp;&emsp;&nbsp;&nbsp;# images for the README.md<br>
+ ├── impl/          &ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# dir for config.json and output files of synth and pnr<br>
+ ├── src/*.vhd / *.vhdl          &nbsp;&ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# source files VHDL<br>
+ ├── src/*.sdc          &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# Synopsys design contraint file (timing constraints)<br>
+ ├── src/*.cst  &ensp;# physical constraints file (pin mapping)<br>
+ ├── *.gprj  &emsp;# gowin project file<br>
  └── *.vhd          &emsp;&emsp;&emsp;&emsp;&emsp;# VHDL source files
 
 ---
 ## Build / Simulation
-* Target FPGA: Cyclone V (5CGXFC5C6F27) on Cyclone V GX Starter Kit
+* Target FPGA: GW1NR-9C on Tang Nano 9k
 * Tested with Quartus II
 * Tested only on Hardware
 * No testbench coverage yet (wip)
 ---
 ## Compile Scripts
 
-### compile_wo_sta.bat
-The static timing analysis is skipped with this script.
-```console
-G:\altera\13.0sp1\quartus\bin64\quartus_map --read_settings_files=on --write_settings_files=off graphics_pipe -c graphics_pipe_top
-G:\altera\13.0sp1\quartus\bin64\quartus_fit --read_settings_files=off --write_settings_files=off graphics_pipe -c graphics_pipe_top
-G:\altera\13.0sp1\quartus\bin64\quartus_asm --read_settings_files=off --write_settings_files=off graphics_pipe -c graphics_pipe_top
+### synthesis & place & route
+Build scripts depend very much on the type of toolchain and environment (docker/native) you are using.
 
-G:\altera\13.0sp1\quartus\bin64\quartus_pgm -c USB-Blaster -o "p;.\output_files\graphics_pipe_top.sof" -m JTAG
-```
-This script needs to be modified to account for the path of your Quartus installation.
 
-### compile_w_sta.bat
+### programming
 
-```console
-G:\altera\13.0sp1\quartus\bin64\quartus_sh --flow compile graphics_pipe.qpf -c graphics_pipe_top
 
-G:\altera\13.0sp1\quartus\bin64\quartus_pgm -c USB-Blaster -o "p;.\output_files\graphics_pipe_top.sof" -m JTAG
-```
-This script needs to be modified to account for the path of your Quartus installation.
 
 
 ---
 ### Limitations
 * No Z-buffer
+* Timing not met -> seems to be working but the occasional flicker of a vertex can be observed
 * No filled faces / triangles
 * No clipping
 * Sometimes precision artifacts due to fixed-point math
 * ~~Choppy motion when depth changes (known issue)~~ fixed
 * No frame buffer
-* Line positions are computed in real time for each pixel with vector math -> low vertex count models only
+* ~~Line positions are computed in real time for each pixel with vector math -> low vertex count models only~~
 ---
 ### Roadmap / Ideas
+* [ ] more More pipelining to meet timing
 * [ ] Line clipping
 * [ ] Simple triangle fill
 * [ ] Depth sorting
@@ -135,4 +125,4 @@ This script needs to be modified to account for the path of your Quartus install
 * [ ] More control interfaces
 * [ ] Frame buffer
 * [ ] Line-drawing algorithm like Bresenham or Xiaolin Wu
-~~
+
