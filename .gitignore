@@ -1,0 +1,17 @@
+# Gowin implementation output; keep the reusable process configuration.
+/impl/**
+!/impl/*_config.json
+
+# Local Gowin GUI state.
+*.gprj.user
+
+# Local build/programming scripts.
+*.sh
+*.tcl
+
+# Supplemental model/export assets (not part of this port yet).
+/supplemental/
+
+# Common local files.
+.DS_Store
+*~
