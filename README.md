@@ -71,26 +71,26 @@ Perspective Divide
    ↓
 Screen Space Mapping
    ↓
-~~lIne Rasterization~~
+Vertex coloring and thickening
    ↓
 Video Output
 ```
 ---
 ## Project structure
 ./ <br>
- ├── _archive/     &ensp;&nbsp;&nbsp;# useful snippets and entities currently not used<br>
- ├── images/      &emsp;&nbsp;&emsp;&nbsp;&nbsp;# images for the README.md<br>
- ├── impl/          &ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# dir for config.json and output files of synth and pnr<br>
- ├── src/*.vhd / *.vhdl          &nbsp;&ensp;&ensp;&nbsp;&emsp;&emsp;&emsp;&emsp;# source files VHDL<br>
- ├── src/*.sdc          &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# Synopsys design contraint file (timing constraints)<br>
- ├── src/*.cst  &ensp;# physical constraints file (pin mapping)<br>
- ├── *.gprj  &emsp;# gowin project file<br>
- └── *.vhd          &emsp;&emsp;&emsp;&emsp;&emsp;# VHDL source files
+ ├── _archive/               # useful snippets and entities currently not used<br>
+ ├── images/                 # images for the README.md<br>
+ ├── impl/                   # dir for config.json and output files of synth and pnr<br>
+ ├── src/\*.vhd / \*.vhdl      # source files VHDL<br>
+ ├── src/\*.sdc          &nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;# Synopsys design contraint file (timing constraints)<br>
+ ├── src/\*.cst               # physical constraints file (pin mapping)<br>
+ ├── *.gprj                  # gowin project file<br>
+ └── *.vhd                  # VHDL source files
 
 ---
 ## Build / Simulation
 * Target FPGA: GW1NR-9C on Tang Nano 9k
-* Tested with Quartus II
+* Tested with Gowin V1.9.11.03 Education on Arch Linux in Ubuntu 22 Docker
 * Tested only on Hardware
 * No testbench coverage yet (wip)
 ---
@@ -112,7 +112,7 @@ Build scripts depend very much on the type of toolchain and environment (docker/
 * No filled faces / triangles
 * No clipping
 * Sometimes precision artifacts due to fixed-point math
-* ~~Choppy motion when depth changes (known issue)~~ fixed
+* ~~Choppy motion when depth changes (known issue)~~ *fixed*
 * No frame buffer
 * ~~Line positions are computed in real time for each pixel with vector math -> low vertex count models only~~
 ---
