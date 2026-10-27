@@ -25,7 +25,7 @@ A deliberately crude and experimental, but functional 3D graphics pipeline writt
 > A minimal and intentionally crude 3D graphics pipeline implemented in VHDL and running on an FPGA.
 
 <p align="center">
- <img src="images/cube0.gif" width="300" alt="Demo screenshot">
+ <img src="images/renderer-demo.png" width="300" alt="Renderer demo frame">
 </p>
 
 
@@ -56,7 +56,7 @@ The focus is on **learning, experimentation, and clarity**, not performance or v
 
 |Rotating Cube|
 |-|
-|![cube](images/cube.gif)|
+|<img src="images/renderer-demo.gif" width="300" alt="Rotating renderer demo">|
 
 ---
 
@@ -125,4 +125,3 @@ Build scripts depend very much on the type of toolchain and environment (docker/
 * [ ] More control interfaces
 * [ ] Frame buffer
 * [ ] Line-drawing algorithm like Bresenham or Xiaolin Wu
-
