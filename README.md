@@ -22,7 +22,8 @@ A deliberately crude and experimental, but functional 3D graphics pipeline writt
 
 ## crude-3D-renderer-demo
 
-> A minimal and intentionally crude 3D graphics pipeline implemented in VHDL and running on an FPGA.
+> A minimal and intentionally crude 3D graphics pipeline implemented in VHDL and running on an FPGA.<br> Eight projected vertices of a 3D cube:
+
 
 <p align="center">
  <img src="images/renderer-demo.png" width="300" alt="Renderer demo frame">
