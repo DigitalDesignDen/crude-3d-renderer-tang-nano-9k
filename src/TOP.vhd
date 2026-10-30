@@ -2,11 +2,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.house_model_pkg.all;
+use work.control_reg_pkg.register_t;
 
 entity TOP is
     generic (
-        MODEL_SCALE_Q8_8 : positive := 8;
-        FOCAL_LENGTH     : positive := 120
+        MODEL_SCALE_Q8_8 : positive := 8
+        --FOCAL_LENGTH     : positive := 120
     );
     port (
         CLK27      : in  std_logic;
@@ -66,7 +67,10 @@ architecture rtl of TOP is
     signal point_in_front : std_logic := '0';
     signal projected_x    : integer range -2048 to 2047 := CENTER_X;
 
-    signal received_byte  : std_logic_vector(7 downto 0);
+    signal received_uart_byte  : std_logic_vector(7 downto 0);
+    signal reg0                : register_t;
+    signal uart_data_valid     : std_logic;
+
 
     component Gowin_rPLL is
         port (
@@ -112,8 +116,17 @@ begin
             clk        => CLK27,
             rst        => reset,
             rx         => UART_RX,
-            data_out   => received_byte,
-            data_valid => open
+            data_out   => received_uart_byte,
+            data_valid => uart_data_valid
+        );
+
+    reg0_inst : entity work.control_reg(rtl)
+        port map (
+            clk           => CLK27,
+            rst           => reset,
+            byte_in       => received_uart_byte,
+            data_in_valid => uart_data_valid,
+            register_out  => reg0
         );
 
 
@@ -167,7 +180,8 @@ begin
         variable scaled_z       : integer;
         variable rotated_x      : integer;
         variable rotated_z      : integer;
-        variable focal          : integer range 0 to 255;
+        variable depth_scale    : integer range 0 to 255;
+        variable focal_length   : natural := 120;
         variable depth_q8_8     : integer;
         variable numerator     : integer;
         variable shifted_rem   : unsigned(16 downto 0);
@@ -204,7 +218,8 @@ begin
                             vertex_index <= 0;
                             write_bank <= not display_bank;
                             state <= CALCULATE;
-                            focal := to_integer(unsigned(received_byte));
+                            focal_length := reg0.FOCAL_LENGTH;
+                            depth_scale := reg0.DEPTH_SCALE;
                         end if;
 
                     when CALCULATE =>
@@ -212,7 +227,7 @@ begin
                         scaled_z := (HOUSE_VERTICES(vertex_index).z - HOUSE_CENTER_Z) * MODEL_SCALE_Q8_8;
                         rotated_x := (scaled_x * cosine_value + scaled_z * sine_value) / 32768;
                         rotated_z := (-scaled_x * sine_value + scaled_z * cosine_value) / 32768;
-                        depth_q8_8 := 2048 + (rotated_z * focal) / 256; --1024 --59
+                        depth_q8_8 := 2048 + (rotated_z * depth_scale) / 256; --1024 --59
                         if depth_q8_8 > 256 then
                             point_in_front <= '1';
                         else
@@ -225,7 +240,7 @@ begin
                             depth_q8_8 := 65535;
                         end if;
                         divisor <= to_unsigned(depth_q8_8, divisor'length);
-                        numerator := rotated_x * FOCAL_LENGTH;
+                        numerator := rotated_x * focal_length;
                         if numerator < 0 then
                             result_negative <= '1';
                         else
@@ -270,7 +285,7 @@ begin
                         end if;
 
                         numerator := (HOUSE_VERTICES(vertex_index).y - HOUSE_CENTER_Y) *
-                                     MODEL_SCALE_Q8_8 * FOCAL_LENGTH;
+                                     MODEL_SCALE_Q8_8 * focal_length;
                         if numerator > 0 then
                             result_negative <= '1';
                         else
