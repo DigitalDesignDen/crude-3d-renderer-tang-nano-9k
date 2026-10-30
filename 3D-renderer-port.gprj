@@ -4,7 +4,9 @@
     <Template>FPGA</Template>
     <Version>5</Version>
     <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>
-    <FileList>
+  <FileList>
+        <File path="src/uart_rx.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/house_model_pkg.vhd" type="file.vhdl" enable="1"/>
         <File path="src/TOP.vhd" type="file.vhdl" enable="1"/>
         <File path="src/sincos_lut.vhd" type="file.vhdl" enable="1"/>
         <File path="src/video_timing.vhd" type="file.vhdl" enable="1"/>

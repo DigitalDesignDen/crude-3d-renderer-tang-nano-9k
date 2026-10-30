@@ -1,15 +1,15 @@
 ## Tang Nano 9K port
 
 This is a Gowin Tang Nano 9K port of the project https://github.com/DigitalDesignDen/crude-3D-render-demo.git.
-It uses the DVI/HDMI output for display.
-It displays eight vertices of a hard-coded cube as colored points.
-The renderer updates its projected
-vertices once per video frame; it performs Y-axis rotation, uniform model
-scaling, and perspective division. It intentionally has no line drawing or
-frame buffer.
+It uses the DVI/HDMI output for display and renders ten points describing a
+simple house model. The small model keeps the combinational point renderer
+within the Tang Nano 9K's logic budget. The renderer updates its
+projected vertices once per video frame; it performs Y-axis rotation, uniform
+model scaling, and perspective division. It intentionally has no line drawing
+or frame buffer.
 
 
-The default model scale is 0.5 (`MODEL_SCALE_Q8_8 = 128`, Q8.8) and the focal
+The default model scale is 0.03125 (`MODEL_SCALE_Q8_8 = 8`, Q8.8) and the focal
 length is 120 pixels. These are generics on `TOP` in `src/TOP.vhd`. The DVI
 timing is 720x480 with the 27 MHz pixel clock and 5x serial PLL.
 

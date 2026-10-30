@@ -1,15 +1,17 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.house_model_pkg.all;
 
 entity TOP is
     generic (
-        MODEL_SCALE_Q8_8 : positive := 128;
+        MODEL_SCALE_Q8_8 : positive := 8;
         FOCAL_LENGTH     : positive := 120
     );
     port (
         CLK27      : in  std_logic;
         RESETN     : in  std_logic;
+        UART_RX    : in  std_logic;
         tmds_clk_n : out std_logic;
         tmds_clk_p : out std_logic;
         tmds_d_n   : out std_logic_vector(2 downto 0);
@@ -22,15 +24,10 @@ architecture rtl of TOP is
     constant V_ACTIVE : positive := 480;
     constant CENTER_X : integer := H_ACTIVE / 2;
     constant CENTER_Y : integer := V_ACTIVE / 2;
-    constant VERTEX_COUNT : positive := 8;
+    constant VERTEX_COUNT : positive := HOUSE_VERTICES'length;
 
-    type vertex_array_t is array (0 to VERTEX_COUNT - 1) of integer range -4096 to 4096;
     type pixel_array_t is array (0 to VERTEX_COUNT - 1) of integer range -2048 to 2047;
     type renderer_state_t is (IDLE, CALCULATE, DIVIDE_X, SAVE_X, DIVIDE_Y, SAVE_Y);
-
-    constant VERTEX_X : vertex_array_t := (-595, -1628, 3090, 2056, -2056, -3090, 1628, 595);
-    constant VERTEX_Y : vertex_array_t := (648, 3132, 73, 2558, -2558, -73, -3132, -648);
-    constant VERTEX_Z : vertex_array_t := (3437, 348, 1741, -1347, 1347, -1741, -348, -3437);
 
     signal reset          : std_logic;
     signal pixel_clk      : std_logic;
@@ -69,6 +66,8 @@ architecture rtl of TOP is
     signal point_in_front : std_logic := '0';
     signal projected_x    : integer range -2048 to 2047 := CENTER_X;
 
+    signal received_byte  : std_logic_vector(7 downto 0);
+
     component Gowin_rPLL is
         port (
             clkout : out std_logic;
@@ -103,6 +102,20 @@ begin
             clkout => serial_clk,
             clkin  => CLK27
         );
+
+    receiver_inst : entity work.uart_rx
+        generic map (
+            CLK_FREQ_HZ => 27_000_000,
+            BAUD_RATE   => 115_200
+        )
+        port map (
+            clk        => CLK27,
+            rst        => reset,
+            rx         => UART_RX,
+            data_out   => received_byte,
+            data_valid => open
+        );
+
 
     timing_inst : entity work.video_timing
         generic map (
@@ -154,6 +167,7 @@ begin
         variable scaled_z       : integer;
         variable rotated_x      : integer;
         variable rotated_z      : integer;
+        variable focal          : integer range 0 to 255;
         variable depth_q8_8     : integer;
         variable numerator     : integer;
         variable shifted_rem   : unsigned(16 downto 0);
@@ -190,14 +204,15 @@ begin
                             vertex_index <= 0;
                             write_bank <= not display_bank;
                             state <= CALCULATE;
+                            focal := to_integer(unsigned(received_byte));
                         end if;
 
                     when CALCULATE =>
-                        scaled_x := (VERTEX_X(vertex_index) * MODEL_SCALE_Q8_8) / 256;
-                        scaled_z := (VERTEX_Z(vertex_index) * MODEL_SCALE_Q8_8) / 256;
+                        scaled_x := (HOUSE_VERTICES(vertex_index).x - HOUSE_CENTER_X) * MODEL_SCALE_Q8_8;
+                        scaled_z := (HOUSE_VERTICES(vertex_index).z - HOUSE_CENTER_Z) * MODEL_SCALE_Q8_8;
                         rotated_x := (scaled_x * cosine_value + scaled_z * sine_value) / 32768;
                         rotated_z := (-scaled_x * sine_value + scaled_z * cosine_value) / 32768;
-                        depth_q8_8 := 1024 + (rotated_z * 59) / 256;
+                        depth_q8_8 := 2048 + (rotated_z * focal) / 256; --1024 --59
                         if depth_q8_8 > 256 then
                             point_in_front <= '1';
                         else
@@ -254,7 +269,8 @@ begin
                             projected_x <= screen_value;
                         end if;
 
-                        numerator := (VERTEX_Y(vertex_index) * MODEL_SCALE_Q8_8 / 256) * FOCAL_LENGTH;
+                        numerator := (HOUSE_VERTICES(vertex_index).y - HOUSE_CENTER_Y) *
+                                     MODEL_SCALE_Q8_8 * FOCAL_LENGTH;
                         if numerator > 0 then
                             result_negative <= '1';
                         else
@@ -347,16 +363,9 @@ begin
                        pixel_x >= point_x - 2 and pixel_x <= point_x + 2 and
                        pixel_y >= point_y - 2 and pixel_y <= point_y + 2 then
                         point_found := true;
-                        case i is
-                            when 0 => red <= x"FF"; green <= x"FF"; blue <= x"FF";
-                            when 1 => red <= x"00"; green <= x"FF"; blue <= x"00";
-                            when 2 => red <= x"00"; green <= x"80"; blue <= x"FF";
-                            when 3 => red <= x"FF"; green <= x"40"; blue <= x"00";
-                            when 4 => red <= x"FF"; green <= x"00"; blue <= x"FF";
-                            when 5 => red <= x"00"; green <= x"FF"; blue <= x"FF";
-                            when 6 => red <= x"FF"; green <= x"FF"; blue <= x"00";
-                            when others => red <= x"FF"; green <= x"80"; blue <= x"00";
-                        end case;
+                        red <= x"FF";
+                        green <= x"B0";
+                        blue <= x"40";
                     end if;
                 else
                     point_x := x_pixels_1(i);
@@ -365,16 +374,9 @@ begin
                        pixel_x >= point_x - 2 and pixel_x <= point_x + 2 and
                        pixel_y >= point_y - 2 and pixel_y <= point_y + 2 then
                         point_found := true;
-                        case i is
-                            when 0 => red <= x"FF"; green <= x"FF"; blue <= x"FF";
-                            when 1 => red <= x"00"; green <= x"FF"; blue <= x"00";
-                            when 2 => red <= x"00"; green <= x"80"; blue <= x"FF";
-                            when 3 => red <= x"FF"; green <= x"40"; blue <= x"00";
-                            when 4 => red <= x"FF"; green <= x"00"; blue <= x"FF";
-                            when 5 => red <= x"00"; green <= x"FF"; blue <= x"FF";
-                            when 6 => red <= x"FF"; green <= x"FF"; blue <= x"00";
-                            when others => red <= x"FF"; green <= x"80"; blue <= x"00";
-                        end case;
+                        red <= x"FF";
+                        green <= x"B0";
+                        blue <= x"40";
                     end if;
                 end if;
             end loop;
